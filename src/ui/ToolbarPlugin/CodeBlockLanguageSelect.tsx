@@ -32,8 +32,13 @@ export function CodeBlockLanguageSelect() {
         })
       }}
     >
-      <SelectTrigger title="Change code block language" placeholder="Language" className={styles.toolbarCodeBlockLanguageSelectTrigger} />
-      <SelectContent className={styles.toolbarCodeBlockLanguageSelectContent}>
+      <SelectTrigger
+        title="Change code block language"
+        placeholder="Language"
+        className={styles.toolbarCodeBlockLanguageSelectTrigger}
+        useEmitterValues={useEmitterValues}
+      />
+      <SelectContent className={styles.toolbarCodeBlockLanguageSelectContent} useEmitterValues={useEmitterValues}>
         {Object.entries(codeBlockLanguages).map(([value, label]) => (
           <SelectItem key={value} value={value}>
             {label}

@@ -23,7 +23,7 @@ export function HomepageMiniEditor() {
           ToolbarComponents.ToolbarSeparator,
           ToolbarComponents.LinkButton,
           ToolbarComponents.BlockTypeSelect
-        ]}
+        ] as any}
       />
     </div>
   )

@@ -132,10 +132,12 @@ export const MdastAdmonitionVisitor: MdastImportVisitor<ContainerDirective> = {
   }
 }
 
-export const MdastLeafDirectiveVisitor: MdastImportVisitor<LeafDirective> = {
-  testNode: 'leafDirective',
-  visitNode({ lexicalParent, mdastNode }) {
-    ;(lexicalParent as ElementNode).append($createLeafDirectiveNode(mdastNode))
+export function createMdastLeafDirectiveVisitor(options: GetMdastVisitorsOptions): MdastImportVisitor<LeafDirective> {
+  return {
+    testNode: 'leafDirective',
+    visitNode({ lexicalParent, mdastNode }) {
+      ;(lexicalParent as ElementNode).append($createLeafDirectiveNode(mdastNode, options.useEmitterValues))
+    }
   }
 }
 
@@ -177,10 +179,12 @@ export const MdastBlockQuoteVisitor: MdastImportVisitor<Mdast.Blockquote> = {
   }
 }
 
-export const MdastTableVisitor: MdastImportVisitor<Mdast.Table> = {
-  testNode: 'table',
-  visitNode({ mdastNode, lexicalParent }) {
-    ;(lexicalParent as ElementNode).append($createTableNode(mdastNode))
+export function createMdastTableVisitor(options: GetMdastVisitorsOptions): MdastImportVisitor<Mdast.Table> {
+  return {
+    testNode: 'table',
+    visitNode({ mdastNode, lexicalParent }) {
+      ;(lexicalParent as ElementNode).append($createTableNode(mdastNode, options.useEmitterValues))
+    }
   }
 }
 
@@ -314,8 +318,8 @@ export function getMdastVisitors(options: GetMdastVisitorsOptions) {
     MdastAdmonitionVisitor,
     MdastMdxJsEsmVisitor,
     MdastMdxJsxElementVisitor: createMdastMdxJsxElementVisitor(options),
-    MdastTableVisitor,
-    MdastLeafDirectiveVisitor
+    MdastTableVisitor: createMdastTableVisitor(options),
+    MdastLeafDirectiveVisitor: createMdastLeafDirectiveVisitor(options)
   }
 }
 

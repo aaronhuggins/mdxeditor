@@ -2,6 +2,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $createParagraphNode, $insertNodes } from 'lexical'
 import { LeafDirective } from 'mdast-util-directive'
 import React from 'react'
+import { useEmitterValues } from '../system/EditorSystemComponent'
 import { $createLeafDirectiveNode, MDXEditor, ToolbarComponents } from '../'
 
 const {
@@ -28,6 +29,7 @@ const YouTubeButton = () => {
       submitButtonTitle="Insert video"
       dialogInputPlaceholder="Paste the youtube video URL"
       buttonContent="YT"
+      useEmitterValues={useEmitterValues}
       onSubmit={(url) => {
         const videoId = new URL(url).searchParams.get('v')
         if (videoId) {
@@ -81,7 +83,7 @@ const toolbarComponents = [
 export function Hello() {
   return (
     <MDXEditor
-      toolbarComponents={toolbarComponents}
+      toolbarComponents={toolbarComponents as any}
       markdown={`
 This should be an youtube video:
 

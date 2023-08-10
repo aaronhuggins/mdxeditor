@@ -21,6 +21,8 @@ import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 import type { EditorSystemComponent } from '../system/EditorSystemComponent'
 import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 
+type UseEmitterValues = EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+
 export type updateFn = (node: LexicalNode) => void
 
 /**
@@ -50,7 +52,7 @@ export interface CreateJsxNodeOptions {
   /**
    * The useEmitterValues function of an editor system.
    */
-  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  useEmitterValues?: UseEmitterValues
 }
 
 /**
@@ -106,9 +108,11 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
   __name: string
   __attributes: Array<MdxJsxAttribute>
   __editor: LexicalEditor
-  __useEmitterValues: JsxNodeConstructorParams['useEmitterValues']
+  get __useEmitterValues(): UseEmitterValues {
+    return JsxNode.useEmitterValues
+  }
 
-  static useEmitterValues: JsxNodeConstructorParams['useEmitterValues']
+  static useEmitterValues: UseEmitterValues
 
   static getType(): string {
     return 'jsx'
@@ -119,8 +123,7 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
       name: node.__name,
       kind: node.__kind,
       attributes: node.__attributes,
-      state: node.__editor.getEditorState().toJSON(),
-      useEmitterValues: node.__useEmitterValues
+      state: node.__editor.getEditorState().toJSON()
     })
   }
 
@@ -130,12 +133,11 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
       kind,
       name,
       attributes,
-      state,
-      useEmitterValues: JsxNode.useEmitterValues
+      state
     })
   }
 
-  constructor({ name, kind, attributes, state, updateFn, key, useEmitterValues }: JsxNodeConstructorParams) {
+  constructor({ name, kind, attributes, state, updateFn, key }: JsxNodeConstructorParams) {
     super(key)
     if (!attributes) {
       debugger
@@ -144,10 +146,6 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     this.__kind = kind
     this.__attributes = attributes
     this.__editor = createEditor()
-    this.__useEmitterValues = useEmitterValues
-    if (!JsxNode.useEmitterValues) {
-      JsxNode.useEmitterValues = useEmitterValues
-    }
     if (state) {
       const parsedState = this.__editor.parseEditorState(state)
       if (!parsedState.isEmpty()) {
@@ -257,6 +255,9 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
  * @see {@link CreateJsxNodeOptions} for more details.
  */
 export function $createJsxNode(options: CreateJsxNodeOptions): JsxNode {
+  if (options.useEmitterValues) {
+    JsxNode.useEmitterValues = options.useEmitterValues
+  }
   return new JsxNode(options)
 }
 

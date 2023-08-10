@@ -4,6 +4,10 @@ import type { LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread
 import { DecoratorNode } from 'lexical'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 import { LeafDirective } from 'mdast-util-directive'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
+
+type UseEmitterValues = EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 
 /**
  * A serialized representation of an {@link LeafDirectiveNode}.
@@ -22,6 +26,11 @@ export type SerializedLeafDirectiveNode = Spread<
  */
 export class LeafDirectiveNode extends DecoratorNode<JSX.Element> {
   __mdastNode: LeafDirective
+  get __useEmitterValues(): UseEmitterValues {
+    return LeafDirectiveNode.useEmitterValues
+  }
+
+  static useEmitterValues: UseEmitterValues
 
   static getType(): string {
     return 'leafDirective'
@@ -72,7 +81,7 @@ export class LeafDirectiveNode extends DecoratorNode<JSX.Element> {
       }
     }: ExtendedEditorConfig
   ): JSX.Element {
-    return <LeafDirectiveEditor leafDirective={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
+    return <LeafDirectiveEditor leafDirective={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} useEmitterValues={this.__useEmitterValues} />
   }
 
   isInline(): boolean {
@@ -87,7 +96,10 @@ export class LeafDirectiveNode extends DecoratorNode<JSX.Element> {
 /**
  * Creates an {@link LeafDirectiveNode}.
  */
-export function $createLeafDirectiveNode(mdastNode: LeafDirective): LeafDirectiveNode {
+export function $createLeafDirectiveNode(mdastNode: LeafDirective, useEmitterValues?: UseEmitterValues): LeafDirectiveNode {
+  if (useEmitterValues) {
+    LeafDirectiveNode.useEmitterValues = useEmitterValues
+  }
   return new LeafDirectiveNode(mdastNode)
 }
 

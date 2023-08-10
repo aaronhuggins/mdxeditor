@@ -3,6 +3,10 @@ import * as Mdast from 'mdast'
 import React from 'react'
 import { noop } from '../utils/fp'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
+
+type UseEmitterValues = EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 
 /**
  * A serialized representation of a {@link TableNode}.
@@ -36,7 +40,12 @@ function coordinatesEmitter() {
  */
 export class TableNode extends DecoratorNode<JSX.Element> {
   __mdastNode: Mdast.Table
+  get __useEmitterValues(): UseEmitterValues {
+    return TableNode.useEmitterValues
+  }
   focusEmitter = coordinatesEmitter()
+
+  static useEmitterValues: UseEmitterValues
 
   static getType(): string {
     return 'table'
@@ -165,7 +174,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
       }
     }: ExtendedEditorConfig
   ): JSX.Element {
-    return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
+    return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} useEmitterValues={this.__useEmitterValues} />
   }
 
   select(coords: [colIndex: number, rowIndex: number]): void {
@@ -188,6 +197,9 @@ export function $isTableNode(node: LexicalNode | null | undefined): node is Tabl
  * Creates a {@link TableNode}
  * @param mdastNode - The mdast node to create the {@link TableNode} from.
  */
-export function $createTableNode(mdastNode: Mdast.Table): TableNode {
+export function $createTableNode(mdastNode: Mdast.Table, useEmitterValues?: UseEmitterValues): TableNode {
+  if (useEmitterValues) {
+    TableNode.useEmitterValues = useEmitterValues
+  }
   return new TableNode(mdastNode)
 }

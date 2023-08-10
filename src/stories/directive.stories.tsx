@@ -3,6 +3,7 @@ import { $createParagraphNode, $insertNodes } from 'lexical'
 import * as Mdast from 'mdast'
 import { LeafDirective } from 'mdast-util-directive'
 import React from 'react'
+import { useEmitterValues } from '../system/EditorSystemComponent'
 import { CustomLeafDirectiveEditor, $createLeafDirectiveNode, MDXEditor, NestedEditor, ToolbarComponents, useMdastNodeUpdater } from '../'
 
 export default {
@@ -66,6 +67,7 @@ const YouTubeButton = () => {
       submitButtonTitle="Insert video"
       dialogInputPlaceholder="Paste the youtube video URL"
       buttonContent="YT"
+      useEmitterValues={useEmitterValues}
       onSubmit={(url) => {
         const videoId = new URL(url).searchParams.get('v')
         if (videoId) {
@@ -119,7 +121,7 @@ const toolbarComponents = [
 export function Youtube() {
   return (
     <MDXEditor
-      toolbarComponents={toolbarComponents}
+      toolbarComponents={toolbarComponents as any}
       customLeafDirectiveEditors={[YoutubeEditor, CalloutEditor]}
       markdown={`
 This should be an youtube video:
@@ -156,6 +158,7 @@ const CalloutEditor: CustomLeafDirectiveEditor<CalloutDirectiveNode> = {
           contentEditableProps={{
             style: { border: '1px solid red' }
           }}
+          useEmitterValues={useEmitterValues}
         />
       </div>
     )
