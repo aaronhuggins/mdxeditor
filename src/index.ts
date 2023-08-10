@@ -13,5 +13,6 @@ export type { CustomLeafDirectiveEditor, LeafDirectiveEditorProps } from './type
 
 export * from './nodes'
 export * from './ui/MDXEditor'
+export { MDXEditorLiteProps, MDXEditorLite } from './ui/MDXEditorLite'
 export { NestedEditor, useMdastNodeUpdater } from './ui/NodeDecorators/NestedEditor'
 export { ToolbarComponents } from './ui/ToolbarPlugin/toolbarComponents'

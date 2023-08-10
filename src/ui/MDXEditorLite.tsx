@@ -256,7 +256,7 @@ export interface MDXEditorMethods {
 /**
  * The MDXEditor React component. See {@link MDXEditorProps} for the list of available props and the {@link MDXEditorMethods} for the methods exposed through the ref.
  */
-export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorLiteProps>(
+export const MDXEditorLite = React.forwardRef<MDXEditorMethods, MDXEditorLiteProps>(
   (
     {
       markdown,
