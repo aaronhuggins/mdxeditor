@@ -25,7 +25,7 @@ import {
   defaultSyntaxExtensions,
   importMarkdownToLexical
 } from '../import'
-import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
+import { EditorLiteSystemComponent, useEmitterValues, usePublisher } from '../system/EditorLiteSystemComponent'
 import { SandpackConfig, defaultCodeBlockLanguages } from '../system/Sandpack'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
@@ -362,12 +362,10 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             }
           }}
         >
-          <EditorSystemComponent
-            codeBlockLanguages={codeBlockLanguages}
+          <EditorLiteSystemComponent
             markdownSource={markdown}
             headMarkdown={headMarkdown || markdown}
             jsxComponentDescriptors={jsxComponentDescriptors}
-            sandpackConfig={sandpackConfig}
             onChange={onChange}
             viewMode={viewMode}
             linkAutocompleteSuggestions={linkAutocompleteSuggestions}
@@ -406,7 +404,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             <ImagesPlugin useEmitterValues={useEmitterValues} />
             <PatchedMarkdownShortcutPlugin />
             <MDXMethods mdxRef={ref} />
-          </EditorSystemComponent>
+          </EditorLiteSystemComponent>
         </LexicalComposer>
       </div>
     )
