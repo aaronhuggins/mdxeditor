@@ -23,15 +23,19 @@ import * as React from 'react'
 
 import { $createImageNode, $isImageNode, ImageNode, CreateImageNodeOptions } from '../nodes/ImageNode'
 import { CAN_USE_DOM } from '../utils/detectMac'
-import { useEmitterValues } from '../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 
 export type InsertImagePayload = Readonly<CreateImageNodeOptions>
+export type ImagesPluginOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+}
 
 const getDOMSelection = (targetWindow: Window | null): Selection | null => (CAN_USE_DOM ? (targetWindow || window).getSelection() : null)
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> = createCommand('INSERT_IMAGE_COMMAND')
 
-export const ImagesPlugin: React.FC = () => {
+export const ImagesPlugin: React.FC<ImagesPluginOptions> = ({ useEmitterValues }: ImagesPluginOptions) => {
   const [editor] = useLexicalComposerContext()
   const [imageUploadHandler] = useEmitterValues('imageUploadHandler')
 

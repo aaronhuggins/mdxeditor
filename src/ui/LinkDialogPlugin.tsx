@@ -6,7 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
 import { createCommand, LexicalCommand } from 'lexical'
-import { useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 import CheckIcon from './icons/check.svg'
 import CloseIcon from './icons/close.svg'
 import CopyIcon from './icons/content_copy.svg'
@@ -17,6 +18,11 @@ import DropDownIcon from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
 import styles from './styles.module.css'
+
+export type LinkDialogPluginOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
+}
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -119,7 +125,7 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
   )
 }
 
-export function LinkDialogPlugin() {
+export function LinkDialogPlugin({ useEmitterValues, usePublisher }: LinkDialogPluginOptions) {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
   const publishWindowChange = usePublisher('onWindowChange')
   const [linkDialogState, linkAutocompleteSuggestions, activeEditor] = useEmitterValues(

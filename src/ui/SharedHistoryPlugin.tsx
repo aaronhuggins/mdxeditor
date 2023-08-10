@@ -1,8 +1,13 @@
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import React from 'react'
-import { useEmitterValues } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
 
-export const SharedHistoryPlugin = () => {
+export type SharedHistoryPluginOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+}
+
+export const SharedHistoryPlugin = ({ useEmitterValues }: SharedHistoryPluginOptions) => {
   const [historyState] = useEmitterValues('historyState')
   return <HistoryPlugin externalHistoryState={historyState} />
 }

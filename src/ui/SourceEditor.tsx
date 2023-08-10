@@ -2,9 +2,15 @@ import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown'
 import type { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror'
 import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 
-export const SourceEditor = () => {
+export type SourceEditorPluginOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
+}
+
+export const SourceEditor = ({ useEmitterValues, usePublisher }:SourceEditorPluginOptions) => {
   const [markdown] = useEmitterValues('markdownSourceFromEditor')
   const updateMarkdown = usePublisher('markdownSourceFromEditor')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)

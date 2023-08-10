@@ -3,7 +3,8 @@
 import React from 'react'
 import { Diff, Hunk, parseDiff } from 'react-diff-view'
 import { diffLines, formatLines } from 'unidiff'
-import { useEmitterValues } from '../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 
 import 'react-diff-view/style/index.css'
 
@@ -21,25 +22,31 @@ export function DiffViewer({ oldText, newText }: { oldText: string; newText: str
   )
 }
 
-export function MarkdownDiffView() {
+export type MarkdownDiffViewOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+}
+
+export function MarkdownDiffView({ useEmitterValues }: MarkdownDiffViewOptions) {
   const [markdown, headMarkdown] = useEmitterValues('markdownSource', 'headMarkdown')
   return <DiffViewer oldText={headMarkdown} newText={markdown} />
 }
 
 export interface ViewModeProps {
   children: React.ReactNode
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
 }
 
-export const ViewModeToggler: React.FC<ViewModeProps> = ({ children }) => {
+export const ViewModeToggler: React.FC<ViewModeProps> = ({ children, useEmitterValues, usePublisher }) => {
   const [viewMode] = useEmitterValues('viewMode')
   // keep the RTE always mounted, otherwise the state is lost
   return (
     <div>
       <div style={{ display: viewMode === 'editor' ? 'block' : 'none' }}>{children}</div>
-      {viewMode === 'diff' ? <MarkdownDiffView /> : null}
+      {viewMode === 'diff' ? <MarkdownDiffView useEmitterValues={useEmitterValues} /> : null}
       {viewMode === 'markdown' ? (
         <React.Suspense fallback={null}>
-          <SourceEditor />
+          <SourceEditor useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
         </React.Suspense>
       ) : null}
     </div>
