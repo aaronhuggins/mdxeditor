@@ -20,6 +20,14 @@ export interface NodeDecoratorComponents {
   LeafDirectiveEditor: React.FC<LeafDirectiveEditorProps<LeafDirective>>
 }
 
+export interface NodeDecoratorLiteComponents {
+  FrontmatterEditor: React.FC<FrontmatterEditorProps>
+  JsxEditor: React.FC<JsxEditorProps>
+  TableEditor: React.FC<TableEditorProps>
+  ImageEditor: React.FC<ImageEditorProps>
+  LeafDirectiveEditor: React.FC<LeafDirectiveEditorProps<LeafDirective>>
+}
+
 export type ExtendedEditorConfig = EditorConfig & {
   theme: EditorConfig['theme'] & {
     nodeDecoratorComponents: NodeDecoratorComponents

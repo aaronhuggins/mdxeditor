@@ -26,8 +26,7 @@ import {
   importMarkdownToLexical
 } from '../import'
 import { EditorLiteSystemComponent, useEmitterValues, usePublisher } from '../system/EditorLiteSystemComponent'
-import { SandpackConfig, defaultCodeBlockLanguages } from '../system/Sandpack'
-import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
+import { NodeDecoratorLiteComponents } from '../types/ExtendedEditorConfig'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
 import { LinkDialogPlugin } from './LinkDialogPlugin'
@@ -39,14 +38,11 @@ import { ToolbarPlugin } from './ToolbarPlugin'
 import {
   BlockTypeSelect,
   BoldItalicUnderlineButtons,
-  CodeBlockButton,
-  CodeFormattingButton,
   FrontmatterButton,
   HorizontalRuleButton,
   ImageButton,
   LinkButton,
   ListButtons,
-  SandpackButton,
   TableButton,
   ToolbarSeparator
 } from './ToolbarPlugin/toolbarComponents'
@@ -76,18 +72,13 @@ export interface MarkdownParseOptions {
 /**
  * The properties of the {@link MDXEditor} react component
  */
-export interface MDXEditorProps {
+export interface MDXEditorLiteProps {
   /**
    * The markdown content to be edited.
    * Notice: this is the initial value of the editor.
    * If you want to change the value of the editor, use the `setMarkdown` method.
    */
   markdown: string
-  /**
-   * The configuration for the sandpack editor that's used for the fenced code blocks.
-   * @see the {@link SandpackConfig} interface for more details.
-   */
-  sandpackConfig?: SandpackConfig
   /**
    * The markdown content to use for the diff view mode. If not provided, the contents of the `markdown` prop will be used.
    */
@@ -139,10 +130,6 @@ export interface MDXEditorProps {
    * @see the {@link LexicalConvertOptions} interface for more details.
    */
   lexicalConvertOptions?: LexicalConvertOptions
-  /**
-   * The supported code block languages.
-   */
-  codeBlockLanguages?: Record<string, string>
 
   /**
    * Implement this so that users can drag and drop or paste images into the editor.
@@ -168,14 +155,6 @@ const LazyFrontmatterEditor = React.lazy(() =>
 
 const LazyJsxEditor = React.lazy(() => import('./NodeDecorators/JsxEditor').then((module) => ({ default: module.JsxEditor })))
 
-const LazySandpackEditor = React.lazy(() =>
-  import('./NodeDecorators/SandpackEditor').then((module) => ({ default: module.SandpackEditor }))
-)
-
-const LazyCodeBlockEditor = React.lazy(() =>
-  import('./NodeDecorators/CodeBlockEditor').then((module) => ({ default: module.CodeBlockEditor }))
-)
-
 const LazyTableEditor = React.lazy(() => import('./NodeDecorators/TableEditor').then((module) => ({ default: module.TableEditor })))
 
 const LazyImageEditor = React.lazy(() => import('./NodeDecorators/ImageEditor').then((module) => ({ default: module.ImageEditor })))
@@ -184,11 +163,9 @@ const LazyLeafDirectiveEditor = React.lazy(() =>
   import('./NodeDecorators/LeafDirectiveEditor').then((module) => ({ default: module.LeafDirectiveEditor }))
 )
 
-const defaultNodeDecorators: NodeDecoratorComponents = {
+const defaultNodeDecorators: NodeDecoratorLiteComponents = {
   FrontmatterEditor: LazyFrontmatterEditor,
   JsxEditor: LazyJsxEditor,
-  SandpackEditor: LazySandpackEditor,
-  CodeBlockEditor: LazyCodeBlockEditor,
   TableEditor: LazyTableEditor,
   ImageEditor: LazyImageEditor,
   LeafDirectiveEditor: LazyLeafDirectiveEditor
@@ -198,7 +175,6 @@ const defaultToolbarComponents = [
   BoldItalicUnderlineButtons,
   ToolbarSeparator,
 
-  CodeFormattingButton,
   ToolbarSeparator,
 
   ListButtons,
@@ -212,35 +188,7 @@ const defaultToolbarComponents = [
   FrontmatterButton,
 
   ToolbarSeparator,
-
-  CodeBlockButton,
-  SandpackButton
 ]
-
-const defaultSandpackConfig: SandpackConfig = {
-  defaultPreset: 'react',
-  presets: [
-    {
-      name: 'react',
-      meta: 'live react',
-      label: 'React',
-      sandpackTemplate: 'react',
-      sandpackTheme: 'light',
-      snippetFileName: '/App.js',
-      snippetLanguage: 'jsx',
-      initialSnippetContent: `
-export default function App() {
-  return (
-    <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-    </div>
-  );
-}
-`.trim()
-    }
-  ]
-}
 
 /**
  * A structure that holds the default values for the options used in the markdown import/export steps.
@@ -308,13 +256,12 @@ export interface MDXEditorMethods {
 /**
  * The MDXEditor React component. See {@link MDXEditorProps} for the list of available props and the {@link MDXEditorMethods} for the methods exposed through the ref.
  */
-export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
+export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorLiteProps>(
   (
     {
       markdown,
       headMarkdown,
       jsxComponentDescriptors = [],
-      sandpackConfig = defaultSandpackConfig,
       onChange,
       viewMode,
       linkAutocompleteSuggestions,
@@ -334,8 +281,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
         visitors: exportVisitors = Object.values(defaultLexicalVisitors)
       } = {},
       lexicalNodes = Object.values(defaultLexicalNodes),
-      customLeafDirectiveEditors = [],
-      codeBlockLanguages = defaultCodeBlockLanguages
+      customLeafDirectiveEditors = []
     },
     ref
   ) => {
