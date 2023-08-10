@@ -3,30 +3,28 @@ import React from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { EditorSystem } from './Editor'
 import { ViewModeSystem } from './ViewMode'
-import { SandpackSystem } from './Sandpack'
 import { LinkDialogSystem } from './LinkDialog'
 import { JsxSystem } from './Jsx'
 import { OnChangeSystem } from './OnChange'
 import { ToolbarSystem } from './Toolbar'
 import 'mdast-util-directive'
 
-export declare namespace EditorSystemComponent {
+export declare namespace EditorLiteSystemComponent {
   export type UsePublisher = typeof usePublisher;
   export type UseEmitterValues = typeof useEmitterValues;
 }
 
 export const {
-  Component: EditorSystemComponent,
+  Component: EditorLiteSystemComponent,
   usePublisher,
   useEmitterValues
 } = realmFactoryToComponent(
-  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, ToolbarSystem),
+  getRealmFactory(EditorSystem, ViewModeSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, ToolbarSystem),
   {
     required: {
       markdownSource: 'markdownSource',
       headMarkdown: 'headMarkdown',
       jsxComponentDescriptors: 'jsxComponentDescriptors',
-      sandpackConfig: 'sandpackConfig',
       toolbarComponents: 'toolbarComponents',
       markdownParseOptions: 'markdownParseOptions',
       lexicalConvertOptions: 'lexicalConvertOptions',
@@ -38,7 +36,6 @@ export const {
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
       imageAutocompleteSuggestions: 'imageAutocompleteSuggestions',
-      codeBlockLanguages: 'codeBlockLanguages',
       customLeafDirectiveEditors: 'customLeafDirectiveEditors'
     },
     events: {
