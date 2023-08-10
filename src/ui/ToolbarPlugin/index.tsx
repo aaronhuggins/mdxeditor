@@ -3,34 +3,40 @@ import * as RadixToolbar from '@radix-ui/react-toolbar'
 import { $getNodeByKey } from 'lexical'
 import React from 'react'
 import { CodeBlockNode, SandpackNode } from '../../nodes'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { CodeBlockEditorType, SandpackEditorType } from '../../types/ActiveEditorType'
 import styles from '../styles.module.css'
 import { CodeBlockLanguageSelect } from './CodeBlockLanguageSelect'
 import DeleteIcon from '../icons/delete.svg'
 import { ToolbarButton, ToolbarSeparator, ViewModeSwitch } from './toolbarComponents'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 
-export const ToolbarPlugin = () => {
+export type ToolbarPluginOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
+}
+
+export const ToolbarPlugin = ({ useEmitterValues, usePublisher }: ToolbarPluginOptions) => {
   const [activeEditorType, viewMode] = useEmitterValues('activeEditorType', 'viewMode')
 
   return (
     <RadixToolbar.Root className={styles.toolbarRoot} aria-label="Formatting options">
       {viewMode === 'editor' &&
         (activeEditorType.type === 'lexical' ? (
-          <RichTextButtonSet />
+          <RichTextButtonSet useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
         ) : activeEditorType.type === 'codeblock' ? (
-          <CodeBlockButtonSet />
+          <CodeBlockButtonSet useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
         ) : (
-          <SandpackButtonSet />
+          <SandpackButtonSet useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
         ))}
 
       <ToolbarSeparator />
-      <ViewModeSwitch />
+      <ViewModeSwitch useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
     </RadixToolbar.Root>
   )
 }
 
-const CodeBlockButtonSet: React.FC = () => {
+const CodeBlockButtonSet: React.FC<ToolbarPluginOptions> = ({ useEmitterValues }) => {
   const [activeEditor, activeEditorType] = useEmitterValues('activeEditor', 'activeEditorType')
   return (
     <>
@@ -45,6 +51,7 @@ const CodeBlockButtonSet: React.FC = () => {
             node.remove()
           })
         }}
+        useEmitterValues={useEmitterValues}
       >
         <DeleteIcon />
       </ToolbarButton>
@@ -52,7 +59,7 @@ const CodeBlockButtonSet: React.FC = () => {
   )
 }
 
-const SandpackButtonSet: React.FC = () => {
+const SandpackButtonSet: React.FC<ToolbarPluginOptions> = ({ useEmitterValues }) => {
   const [activeEditor, activeEditorType] = useEmitterValues('activeEditor', 'activeEditorType')
   return (
     <>
@@ -65,6 +72,7 @@ const SandpackButtonSet: React.FC = () => {
             node.remove()
           })
         }}
+        useEmitterValues={useEmitterValues}
       >
         <DeleteIcon />
       </ToolbarButton>
@@ -72,12 +80,12 @@ const SandpackButtonSet: React.FC = () => {
   )
 }
 
-const RichTextButtonSet: React.FC = () => {
+const RichTextButtonSet: React.FC<ToolbarPluginOptions> = ({ useEmitterValues, usePublisher }) => {
   const [toolbarComponents] = useEmitterValues('toolbarComponents')
   return (
     <>
-      {toolbarComponents.map((Component, index) => (
-        <Component key={index} />
+      {toolbarComponents.map((Component: any, index) => (
+        <Component key={index} useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
       ))}
     </>
   )

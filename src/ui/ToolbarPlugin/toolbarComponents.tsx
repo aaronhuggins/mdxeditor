@@ -3,7 +3,6 @@ import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import React from 'react'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
-import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
 import type { ViewMode } from '../../types/ViewMode'
 import styles from '../styles.module.css'
 import CodeIcon from './../icons/code.svg'
@@ -31,8 +30,22 @@ export { BlockTypeSelect } from './BlockTypeSelect'
 export { ImageButton } from './Image'
 export { InstantTooltip } from './InstantTooltip'
 
-export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps & { title: string }>(
-  ({ title, children, className: passedClassName, ...props }, forwardedRef) => {
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
+
+type UseProps = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
+}
+
+type ToggleItemProps = RadixToolbar.ToolbarToggleItemProps & {
+  title: string
+  useEmitterValues: UseProps['useEmitterValues']
+  usePublisher?: UseProps['usePublisher']
+}
+
+export const ToggleItem = React.forwardRef<HTMLButtonElement, ToggleItemProps>(
+  ({ title, children, className: passedClassName, useEmitterValues, usePublisher: _up, ...props }, forwardedRef) => {
     return (
       <RadixToolbar.ToggleItem
         data-toolbar-item={true}
@@ -40,24 +53,32 @@ export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.Toolb
         {...props}
         ref={forwardedRef}
       >
-        <InstantTooltip title={title}>{children}</InstantTooltip>
+        <InstantTooltip title={title} useEmitterValues={useEmitterValues}>{children}</InstantTooltip>
       </RadixToolbar.ToggleItem>
     )
   }
 )
 
-export const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps & { title: string }>(
-  ({ title, children, ...props }, forwardedRef) => {
+type ToolbarButtonProps = RadixToolbar.ToolbarButtonProps & {
+  title: string
+  useEmitterValues: UseProps['useEmitterValues']
+  usePublisher?: UseProps['usePublisher']
+}
+
+export const ToolbarButton = React.forwardRef<HTMLButtonElement, ToolbarButtonProps>(
+  ({ title, children, useEmitterValues, usePublisher: _up, ...props }, forwardedRef) => {
     return (
       <RadixToolbar.Button data-toolbar-item={true} className={styles.toolbarButton} {...props} ref={forwardedRef}>
-        <InstantTooltip title={title}>{children}</InstantTooltip>
+        <InstantTooltip title={title} useEmitterValues={useEmitterValues}>{children}</InstantTooltip>
       </RadixToolbar.Button>
     )
   }
 )
 
-export const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
-  ({ children, className, ...props }, forwardedRef) => {
+type ToggleSingleGroupProps = Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & Partial<UseProps>
+
+export const ToggleSingleGroup = React.forwardRef<HTMLDivElement, ToggleSingleGroupProps>(
+  ({ children, className, useEmitterValues: _ue, usePublisher: _up, ...props }, forwardedRef) => {
     return (
       <RadixToolbar.ToggleGroup
         {...props}
@@ -71,26 +92,42 @@ export const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixTool
   }
 )
 
+type ToggleSingleGroupWithItemProps = Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & {
+  on: boolean
+  title: string
+  useEmitterValues: UseProps['useEmitterValues']
+  usePublisher?: UseProps['usePublisher']
+}
+
 export const ToggleSingleGroupWithItem = React.forwardRef<
   HTMLDivElement,
-  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean; title: string }
->(({ on, title, children, ...props }, forwardedRef) => {
+  ToggleSingleGroupWithItemProps
+>(({ on, title, children, useEmitterValues, usePublisher: _up, ...props }, forwardedRef) => {
   return (
     <ToggleSingleGroup {...props} value={on ? 'on' : 'off'} ref={forwardedRef}>
-      <ToggleItem title={title} value="on">
+      <ToggleItem title={title} value="on" useEmitterValues={useEmitterValues}>
         {children}
       </ToggleItem>
     </ToggleSingleGroup>
   )
 })
 
-export const GroupGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+type GroupGroupProps = Partial<UseProps> & {
+  children: React.ReactNode
+}
+
+export const GroupGroup: React.FC<GroupGroupProps> = ({ useEmitterValues: _ue, usePublisher: _up, children }) => {
   return <div className={styles.toolbarGroupOfGroups}>{children}</div>
 }
 
-export const ToolbarSeparator = RadixToolbar.ToolbarSeparator
+type ToolbarSeparatorProps = RadixToolbar.ToolbarSeparatorProps & Partial<UseProps>
 
-export const BoldItalicUnderlineButtons: React.FC = () => {
+export const ToolbarSeparator: React.FC<ToolbarSeparatorProps> = ({ useEmitterValues: _ue, usePublisher: _up, ...props }) => {
+  return <RadixToolbar.ToolbarSeparator { ...props } />
+}
+
+export const BoldItalicUnderlineButtons: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const [currentFormat] = useEmitterValues('currentFormat', 'currentListType')
   const applyFormat = usePublisher('applyFormat')
 
@@ -103,10 +140,22 @@ export const BoldItalicUnderlineButtons: React.FC = () => {
   const underlineTitle = underlineIsOn ? 'Remove underline' : 'Underline'
   return (
     <GroupGroup>
-      <ToggleSingleGroupWithItem title={boldTitle} aria-label="Bold" on={boldIsOn} onValueChange={applyFormat.bind(null, 'bold')}>
+      <ToggleSingleGroupWithItem
+        title={boldTitle}
+        aria-label="Bold"
+        on={boldIsOn}
+        onValueChange={applyFormat.bind(null, 'bold')}
+        useEmitterValues={useEmitterValues}
+      >
         <BoldIcon />
       </ToggleSingleGroupWithItem>
-      <ToggleSingleGroupWithItem title={italicTitle} aria-label="Italic" on={italicIsOn} onValueChange={applyFormat.bind(null, 'italic')}>
+      <ToggleSingleGroupWithItem
+        title={italicTitle}
+        aria-label="Italic"
+        on={italicIsOn}
+        onValueChange={applyFormat.bind(null, 'italic')}
+        useEmitterValues={useEmitterValues}
+      >
         <ItalicIcon />
       </ToggleSingleGroupWithItem>
       <ToggleSingleGroupWithItem
@@ -114,6 +163,7 @@ export const BoldItalicUnderlineButtons: React.FC = () => {
         title={underlineTitle}
         on={underlineIsOn}
         onValueChange={applyFormat.bind(null, 'underline')}
+        useEmitterValues={useEmitterValues}
       >
         <UnderlinedIcon style={{ transform: 'translateY(2px)' }} />
       </ToggleSingleGroupWithItem>
@@ -121,21 +171,29 @@ export const BoldItalicUnderlineButtons: React.FC = () => {
   )
 }
 
-export const CodeFormattingButton: React.FC = () => {
+export const CodeFormattingButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const [currentFormat] = useEmitterValues('currentFormat', 'currentListType')
   const applyFormat = usePublisher('applyFormat')
   const codeIsOn = (currentFormat & IS_CODE) !== 0
   const codeTitle = codeIsOn ? 'Remove inline code' : 'Inline code'
   return (
     <GroupGroup>
-      <ToggleSingleGroupWithItem title={codeTitle} aria-label="Inline code" on={codeIsOn} onValueChange={applyFormat.bind(null, 'code')}>
+      <ToggleSingleGroupWithItem
+        title={codeTitle}
+        aria-label="Inline code"
+        on={codeIsOn}
+        onValueChange={applyFormat.bind(null, 'code')}
+        useEmitterValues={useEmitterValues}
+      >
         <CodeIcon />
       </ToggleSingleGroupWithItem>
     </GroupGroup>
   )
 }
 
-export const ListButtons: React.FC = () => {
+export const ListButtons: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const [currentListType] = useEmitterValues('currentListType')
   const applyListType = usePublisher('applyListType')
   return (
@@ -146,10 +204,10 @@ export const ListButtons: React.FC = () => {
         value={currentListType || ''}
         onFocus={(e) => e.preventDefault()}
       >
-        <ToggleItem title="Bulleted list" value="bullet" aria-label="Bulleted list">
+        <ToggleItem title="Bulleted list" value="bullet" aria-label="Bulleted list" useEmitterValues={useEmitterValues}>
           <BulletedListIcon />
         </ToggleItem>
-        <ToggleItem title="Numbered list" value="number" aria-label="Numbered list">
+        <ToggleItem title="Numbered list" value="number" aria-label="Numbered list" useEmitterValues={useEmitterValues}>
           <NumberedListIcon />
         </ToggleItem>
       </ToggleSingleGroup>
@@ -157,59 +215,64 @@ export const ListButtons: React.FC = () => {
   )
 }
 
-export const LinkButton: React.FC = () => {
+export const LinkButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const openLinkEditDialog = usePublisher('openLinkEditDialog')
   return (
-    <ToolbarButton title="Create link" onClick={openLinkEditDialog.bind(null, true)}>
+    <ToolbarButton title="Create link" onClick={openLinkEditDialog.bind(null, true)} useEmitterValues={useEmitterValues}>
       <LinkIcon />
     </ToolbarButton>
   )
 }
 
-export const TableButton: React.FC = () => {
+export const TableButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const insertTable = usePublisher('insertTable')
   return (
-    <ToolbarButton title="Insert table" onClick={insertTable.bind(null, true)}>
+    <ToolbarButton title="Insert table" onClick={insertTable.bind(null, true)} useEmitterValues={useEmitterValues}>
       <TableIcon />
     </ToolbarButton>
   )
 }
 
-export const CodeBlockButton: React.FC = () => {
+export const CodeBlockButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const insertCodeBlock = usePublisher('insertCodeBlock')
 
   return (
-    <ToolbarButton title="Insert code block" onClick={insertCodeBlock.bind(null, true)}>
+    <ToolbarButton title="Insert code block" onClick={insertCodeBlock.bind(null, true)} useEmitterValues={useEmitterValues}>
       <FrameSourceIcon />
     </ToolbarButton>
   )
 }
 
-export const HorizontalRuleButton: React.FC = () => {
+export const HorizontalRuleButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const insertHorizontalRule = usePublisher('insertHorizontalRule')
   return (
-    <ToolbarButton title="Insert horizontal rule" onClick={insertHorizontalRule.bind(null, true)}>
+    <ToolbarButton title="Insert horizontal rule" onClick={insertHorizontalRule.bind(null, true)} useEmitterValues={useEmitterValues}>
       <HorizontalRuleIcon />
     </ToolbarButton>
   )
 }
 
-export const SandpackButton: React.FC = () => {
+export const SandpackButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const insertSandpack = usePublisher('insertSandpack')
   const [sandpackConfig] = useEmitterValues('sandpackConfig')
   return (
     <>
       {sandpackConfig.presets.length === 1 ? (
-        <ToolbarButton title="Insert live code block" onClick={insertSandpack.bind(null, '')}>
+        <ToolbarButton title="Insert live code block" onClick={insertSandpack.bind(null, '')} useEmitterValues={useEmitterValues}>
           <LiveCodeIcon />
         </ToolbarButton>
       ) : (
         <Select.Root value="" onValueChange={insertSandpack}>
-          <SelectButtonTrigger title="Insert live code snippet">
+          <SelectButtonTrigger title="Insert live code snippet" useEmitterValues={useEmitterValues}>
             <LiveCodeIcon />
           </SelectButtonTrigger>
 
-          <SelectContent className={styles.toolbarButtonDropdownContainer}>
+          <SelectContent className={styles.toolbarButtonDropdownContainer} useEmitterValues={useEmitterValues}>
             {sandpackConfig.presets.map((preset) => (
               <SelectItem key={preset.name} value={preset.meta}>
                 {preset.label}
@@ -222,16 +285,18 @@ export const SandpackButton: React.FC = () => {
   )
 }
 
-export const FrontmatterButton: React.FC = () => {
+export const FrontmatterButton: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const insertFrontmatter = usePublisher('insertFrontmatter')
   return (
-    <ToolbarButton title="Insert frontmatter editor" onClick={insertFrontmatter.bind(null, true)}>
+    <ToolbarButton title="Insert frontmatter editor" onClick={insertFrontmatter.bind(null, true)} useEmitterValues={useEmitterValues}>
       <FrontmatterIcon />
     </ToolbarButton>
   )
 }
 
-export const ViewModeSwitch: React.FC = () => {
+export const ViewModeSwitch: React.FC<UseProps> = (props) => {
+  const { useEmitterValues, usePublisher } = props
   const [viewMode] = useEmitterValues('viewMode', 'activeEditorType')
   const setViewMode = usePublisher('viewMode')
   return (
@@ -245,15 +310,15 @@ export const ViewModeSwitch: React.FC = () => {
       value={viewMode}
       className={styles.toolbarModeSwitch}
     >
-      <ToggleItem value="editor" aria-label="Rich text" title="Rich text mode">
+      <ToggleItem value="editor" aria-label="Rich text" title="Rich text mode" useEmitterValues={useEmitterValues}>
         <RichTextIcon />
       </ToggleItem>
 
-      <ToggleItem value="diff" aria-label="View diff" title="Diff mode">
+      <ToggleItem value="diff" aria-label="View diff" title="Diff mode" useEmitterValues={useEmitterValues}>
         <DifferenceIcon />
       </ToggleItem>
 
-      <ToggleItem value="markdown" aria-label="View Markdown" title="Markdown source mode">
+      <ToggleItem value="markdown" aria-label="View Markdown" title="Markdown source mode" useEmitterValues={useEmitterValues}>
         <MarkdownIcon />
       </ToggleItem>
     </ToggleSingleGroup>

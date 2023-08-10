@@ -3,8 +3,9 @@ import * as Select from '@radix-ui/react-select'
 import DropDownIcon from '../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import styles from '../styles.module.css'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { InstantTooltip } from './InstantTooltip'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
   ({ children, className, ...props }, forwardedRef) => {
@@ -16,9 +17,16 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
   }
 )
 
-export const SelectTrigger: React.FC<{ title: string; placeholder: string; className?: string }> = ({ title, placeholder, className }) => {
+type SelectTriggerProps = {
+  title: string
+  placeholder: string
+  className?: string
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+}
+
+export const SelectTrigger: React.FC<SelectTriggerProps> = ({ title, placeholder, className, useEmitterValues }) => {
   return (
-    <InstantTooltip title={title}>
+    <InstantTooltip title={title} useEmitterValues={useEmitterValues}>
       <Select.Trigger aria-label={placeholder} className={classNames(styles.toolbarNodeKindSelectTrigger, className)}>
         <Select.Value placeholder={placeholder} />
         <Select.Icon className={styles.toolbarNodeKindSelectDropdownArrow}>
@@ -29,9 +37,16 @@ export const SelectTrigger: React.FC<{ title: string; placeholder: string; class
   )
 }
 
-export const SelectContent: React.FC<{ children: React.ReactNode; className?: string }> = ({
+type SelectContentProps = {
+  children: React.ReactNode
+  className?: string
+  useEmitterValues: SelectTriggerProps['useEmitterValues']
+}
+
+export const SelectContent: React.FC<SelectContentProps> = ({
   children,
-  className = styles.toolbarNodeKindSelectContainer
+  className = styles.toolbarNodeKindSelectContainer,
+  useEmitterValues
 }) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 
@@ -44,13 +59,21 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
   )
 }
 
-export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string; className?: string }> = ({
+type SelectButtonTriggerProps = {
+  children: React.ReactNode
+  title: string
+  className?: string
+  useEmitterValues: SelectTriggerProps['useEmitterValues']
+}
+
+export const SelectButtonTrigger: React.FC<SelectButtonTriggerProps> = ({
   children,
   title,
-  className
+  className,
+  useEmitterValues
 }) => {
   return (
-    <InstantTooltip title={title}>
+    <InstantTooltip title={title} useEmitterValues={useEmitterValues}>
       <Select.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)}>
         {children}
         <Select.Icon className={styles.toolbarNodeKindSelectDropdownArrow}>

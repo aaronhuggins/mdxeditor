@@ -1,10 +1,17 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import classNames from 'classnames'
 import React, { ReactNode } from 'react'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 import styles from '../styles.module.css'
 
-export const InstantTooltip = React.forwardRef<HTMLButtonElement, { title: string; children: ReactNode }>(({ title, children }, ref) => {
+type InstantTooltipProps = {
+  title: string
+  children: ReactNode
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+}
+
+export const InstantTooltip = React.forwardRef<HTMLButtonElement, InstantTooltipProps>(({ title, children, useEmitterValues }, ref) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 
   return (

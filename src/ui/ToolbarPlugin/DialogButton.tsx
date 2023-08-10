@@ -1,6 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
 
 import React from 'react'
 
@@ -11,6 +10,8 @@ import CheckIcon from '../icons/check.svg'
 import CloseIcon from '../icons/close.svg'
 import styles from '../styles.module.css'
 import { InstantTooltip } from './InstantTooltip'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 
 export interface DialogButtonProps {
   autocompleteSuggestions?: string[]
@@ -19,13 +20,14 @@ export interface DialogButtonProps {
   buttonContent?: React.ReactNode
   dialogInputPlaceholder: string
   submitButtonTitle: string
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
 // TODO: make this configurable
 const MAX_SUGGESTIONS = 20
 
 export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProps>(
-  ({ autocompleteSuggestions = [], submitButtonTitle, dialogInputPlaceholder, onSubmit, tooltipTitle, buttonContent }, forwardedRef) => {
+  ({ autocompleteSuggestions = [], submitButtonTitle, dialogInputPlaceholder, onSubmit, tooltipTitle, buttonContent, useEmitterValues }, forwardedRef) => {
     const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
     const [open, setOpen] = React.useState(false)
 
@@ -41,7 +43,7 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Trigger asChild>
           <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef}>
-            <InstantTooltip title={tooltipTitle}>{buttonContent}</InstantTooltip>
+            <InstantTooltip title={tooltipTitle} useEmitterValues={useEmitterValues}>{buttonContent}</InstantTooltip>
           </RadixToolbar.Button>
         </Dialog.Trigger>
         <Dialog.Portal container={editorRootElementRef!.current}>

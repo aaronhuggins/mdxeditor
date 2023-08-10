@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 
 import React from 'react'
 
@@ -14,7 +15,12 @@ import styles from '../styles.module.css'
 import { InstantTooltip } from './InstantTooltip'
 import { DialogButton } from './DialogButton'
 
-export const ImageButton = React.forwardRef<HTMLButtonElement, Record<string, never>>((_, forwardedRef) => {
+export type ImageButtonOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
+}
+
+export const ImageButton = React.forwardRef<HTMLButtonElement, ImageButtonOptions>(({ useEmitterValues, usePublisher }, forwardedRef) => {
   const [imageAutocompleteSuggestions] = useEmitterValues('imageAutocompleteSuggestions')
   const insertImage = usePublisher('insertImage')
 
@@ -27,11 +33,18 @@ export const ImageButton = React.forwardRef<HTMLButtonElement, Record<string, ne
       onSubmit={insertImage}
       buttonContent={<AddPhotoIcon />}
       autocompleteSuggestions={imageAutocompleteSuggestions}
+      useEmitterValues={useEmitterValues}
     />
   )
 })
 
-export const OldImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
+type OldImageButtonProps = RadixToolbar.ToolbarButtonProps & {
+  useEmitterValues: ImageButtonOptions['useEmitterValues']
+  usePublisher: ImageButtonOptions['usePublisher']
+}
+
+export const OldImageButton = React.forwardRef<HTMLButtonElement, OldImageButtonProps>((props, forwardedRef) => {
+  const { useEmitterValues, usePublisher } = props
   const [editorRootElementRef, imageAutocompleteSuggestions] = useEmitterValues('editorRootElementRef', 'imageAutocompleteSuggestions')
   const [open, setOpen] = React.useState(false)
   const insertImage = usePublisher('insertImage')
@@ -48,7 +61,7 @@ export const OldImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.T
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
-          <InstantTooltip title="Insert image">
+          <InstantTooltip title="Insert image" useEmitterValues={useEmitterValues}>
             <AddPhotoIcon />
           </InstantTooltip>
         </RadixToolbar.Button>

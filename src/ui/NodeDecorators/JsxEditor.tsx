@@ -49,7 +49,7 @@ interface InlineJsxComponentProps {
   attributes: MdxJsxAttribute[]
   componentName: string
   onSubmit: (values: Record<string, string>) => void
-  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  useEmitterValues: JsxEditorProps['useEmitterValues']
 }
 
 const InlineJsxComponent = ({ attributes, componentName, onSubmit, useEmitterValues }: InlineJsxComponentProps) => {
@@ -81,7 +81,7 @@ interface JsxPropertyPanelProps {
   componentName: string
   attributes: Array<MdxJsxAttribute>
   onSubmit: (values: Record<string, string>) => void
-  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  useEmitterValues: JsxEditorProps['useEmitterValues']
 }
 
 const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes, componentName, onSubmit, useEmitterValues }) => {

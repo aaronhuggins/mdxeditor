@@ -1,23 +1,25 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
-import { AdmonitionKind } from '../../../nodes'
-import { useEmitterValues, usePublisher } from '../../../system/EditorSystemComponent'
 import { SelectItem, SelectTrigger, SelectContent } from '../SelectPieces'
+import type { EditorSystemComponent } from '../../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../../system/EditorLiteSystemComponent'
 
 export type HeadingType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 export type BlockType = 'paragraph' | 'code' | 'quote' | HeadingType
-export interface BLockTypeSelectProps {
-  value: BlockType | AdmonitionKind | ''
-  onValueChange: (value: BlockType) => void
+export interface BlockTypeSelectProps {
+  // value: BlockType | AdmonitionKind | ''
+  // onValueChange: (value: BlockType) => void
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
 }
 
-export const BlockTypeSelect = () => {
+export const BlockTypeSelect = ({ useEmitterValues, usePublisher }: BlockTypeSelectProps) => {
   const [currentBlockType] = useEmitterValues('currentBlockType')
   const applyBlockType = usePublisher('applyBlockType')
   return (
     <Select.Root value={currentBlockType || ('' as const)} onValueChange={applyBlockType as (value: string) => void}>
-      <SelectTrigger title="Select block type" placeholder="Block type" />
-      <SelectContent>
+      <SelectTrigger title="Select block type" placeholder="Block type" useEmitterValues={useEmitterValues} />
+      <SelectContent useEmitterValues={useEmitterValues}>
         <SelectItem value="paragraph">Paragraph</SelectItem>
         <SelectItem value="quote">Quote</SelectItem>
         <Select.Separator />

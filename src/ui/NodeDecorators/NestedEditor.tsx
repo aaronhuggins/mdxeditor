@@ -2,7 +2,6 @@
 import { $getRoot, LexicalEditor, createEditor } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
@@ -11,6 +10,8 @@ import { theme } from '../../content/theme'
 import { exportLexicalTreeToMdast } from '../../export'
 import { importMdastTreeToLexical } from '../../import'
 import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 
 interface NestedEditorsContextValue<T extends Mdast.Content> {
   parentEditor: LexicalEditor
@@ -62,6 +63,7 @@ export interface NestedEditorProps<T extends Mdast.Content> {
    * Props passed to the {@link https://github.com/facebook/lexical/blob/main/packages/lexical-react/src/LexicalContentEditable.tsx | ContentEditable} component.
    */
   contentEditableProps?: React.ComponentProps<typeof ContentEditable>
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
 /**
@@ -81,7 +83,7 @@ export interface NestedEditorProps<T extends Mdast.Content> {
  * ```
  */
 export const NestedEditor = function <T extends Mdast.Content>(props: NestedEditorProps<T>) {
-  const { getContent, getUpdatedMdastNode, contentEditableProps } = props
+  const { getContent, getUpdatedMdastNode, contentEditableProps, useEmitterValues } = props
   const { mdastNode } = useNestedEditorContext<T>()
   const updateMdastNode = useMdastNodeUpdater<T>()
 
@@ -130,7 +132,7 @@ export const NestedEditor = function <T extends Mdast.Content>(props: NestedEdit
         placeholder={<div></div>}
         ErrorBoundary={LexicalErrorBoundary}
       />
-      <SharedHistoryPlugin />
+      <SharedHistoryPlugin useEmitterValues={useEmitterValues} />
     </LexicalNestedComposer>
   )
 }

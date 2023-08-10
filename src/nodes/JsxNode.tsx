@@ -106,9 +106,9 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
   __name: string
   __attributes: Array<MdxJsxAttribute>
   __editor: LexicalEditor
-  __useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  __useEmitterValues: JsxNodeConstructorParams['useEmitterValues']
 
-  static useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  static useEmitterValues: JsxNodeConstructorParams['useEmitterValues']
 
   static getType(): string {
     return 'jsx'

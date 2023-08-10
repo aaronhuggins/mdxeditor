@@ -46,6 +46,7 @@ export interface TableEditorProps {
   parentEditor: LexicalEditor
   lexicalTable: TableNode
   mdastNode: Mdast.Table
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
 export interface ImageEditorProps {
@@ -61,6 +62,7 @@ export interface LeafDirectiveEditorProps<T extends LeafDirective> {
   leafDirective: LeafDirectiveNode
   /** The MDAST node that is being edited */
   mdastNode: T
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
 export interface CustomLeafDirectiveEditor<T extends LeafDirective> {

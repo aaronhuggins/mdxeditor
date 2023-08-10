@@ -36,7 +36,6 @@ import AddColumnIcon from './icons/add_column.svg'
 import styles from '../styles.module.css'
 import classNames from 'classnames'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
 
 const AlignToTailwindClassMap = {
@@ -45,7 +44,7 @@ const AlignToTailwindClassMap = {
   right: styles.rightAlignedCell
 }
 
-export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
+export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable, useEmitterValues }) => {
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
 
   const setActiveCellWithBoundaries = React.useCallback(
@@ -177,7 +176,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                     colIndex,
                     highlightedCoordinates,
                     lexicalTable,
-                    align: (mdastNode.align || [])[colIndex]
+                    align: (mdastNode.align || [])[colIndex],
+                    useEmitterValues
                   }}
                 />
               </th>
@@ -192,7 +192,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
           return (
             <tr key={rowIndex}>
               <td className={styles.toolCell} data-tool-cell={true}>
-                <RowEditor {...{ setActiveCellWithBoundaries, parentEditor, rowIndex, highlightedCoordinates, lexicalTable }} />
+                <RowEditor {...{ setActiveCellWithBoundaries, parentEditor, rowIndex, highlightedCoordinates, lexicalTable, useEmitterValues }} />
               </td>
               {row.children.map((mdastCell, colIndex) => {
                 return (
@@ -200,7 +200,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                     align={mdastNode.align?.[colIndex]}
                     key={colIndex}
                     contents={mdastCell.children}
-                    {...{ rowIndex, colIndex, lexicalTable, parentEditor, activeCellTuple: [activeCell, setActiveCellWithBoundaries] }}
+                    {...{ rowIndex, colIndex, lexicalTable, parentEditor, activeCellTuple: [activeCell, setActiveCellWithBoundaries], useEmitterValues }}
                   />
                 )
               })}
@@ -238,6 +238,7 @@ export interface CellProps {
   rowIndex: number
   align?: Mdast.AlignType
   activeCellTuple: [[number, number] | null, (cell: [number, number] | null) => void]
+  useEmitterValues: TableEditorProps['useEmitterValues']
 }
 
 const Cell: React.FC<CellProps> = ({ align, ...props }) => {
@@ -258,7 +259,7 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
   )
 }
 
-const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
+const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexicalTable, contents, colIndex, rowIndex, useEmitterValues }) => {
   const [markdownParseOptions, lexicalConvertOptions, jsxComponentDescriptors, lexicalNodes] = useEmitterValues(
     'markdownParseOptions',
     'lexicalConvertOptions',
@@ -346,7 +347,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin contentEditable={<ContentEditable autoFocus />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
-      <SharedHistoryPlugin />
+      <SharedHistoryPlugin useEmitterValues={useEmitterValues} />
     </LexicalNestedComposer>
   )
 }
@@ -358,6 +359,7 @@ interface ColumnEditorProps {
   highlightedCoordinates: [number, number]
   setActiveCellWithBoundaries: (cell: [number, number] | null) => void
   align: Mdast.AlignType
+  useEmitterValues: TableEditorProps['useEmitterValues']
 }
 
 const ColumnEditor: React.FC<ColumnEditorProps> = ({
@@ -366,7 +368,8 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   align,
   lexicalTable,
   colIndex,
-  setActiveCellWithBoundaries
+  setActiveCellWithBoundaries,
+  useEmitterValues
 }) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 
@@ -455,6 +458,7 @@ interface RowEditorProps {
   rowIndex: number
   highlightedCoordinates: [number, number]
   setActiveCellWithBoundaries: (cell: [number, number] | null) => void
+  useEmitterValues: TableEditorProps['useEmitterValues']
 }
 
 const RowEditor: React.FC<RowEditorProps> = ({
@@ -462,7 +466,8 @@ const RowEditor: React.FC<RowEditorProps> = ({
   highlightedCoordinates,
   lexicalTable,
   rowIndex,
-  setActiveCellWithBoundaries
+  setActiveCellWithBoundaries,
+  useEmitterValues
 }) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 

@@ -375,7 +375,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             linkAutocompleteSuggestions={linkAutocompleteSuggestions}
             imageAutocompleteSuggestions={imageAutoCompleteSuggestions}
             editorRootElementRef={editorRootElementRef as any}
-            toolbarComponents={toolbarComponents}
+            toolbarComponents={toolbarComponents as any}
             markdownParseOptions={{
               visitors: importVisitors,
               mdastExtensions,
@@ -390,7 +390,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             imageUploadHandler={imageUploadHandler}
             customLeafDirectiveEditors={customLeafDirectiveEditors}
           >
-            <ToolbarPlugin />
+            <ToolbarPlugin useEmitterValues={useEmitterValues} usePublisher={usePublisher} />
             <ViewModeToggler useEmitterValues={useEmitterValues} usePublisher={usePublisher}>
               <RichTextPlugin
                 contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
