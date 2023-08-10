@@ -21,8 +21,8 @@ import {
   SyntaxExtension,
   defaultLexicalNodes,
   defaultMdastExtensions,
-  defaultMdastVisitors,
   defaultSyntaxExtensions,
+  getMdastVisitors,
   importMarkdownToLexical
 } from '../import'
 import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
@@ -264,6 +264,8 @@ export type DefaultMdxOptionValues = {
   /** The default lexical nodes used by the underlying Lexical framework */
   defaultLexicalNodes: typeof defaultLexicalNodes
 }
+
+const defaultMdastVisitors = getMdastVisitors({ useEmitterValues, usePublisher })
 
 /**
  * Exports the default values for the options used in the markdown import/export steps.

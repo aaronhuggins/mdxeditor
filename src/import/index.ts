@@ -36,6 +36,8 @@ import {
   SandpackNode,
   TableNode
 } from '../nodes'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 
 /**
  * A set of actions that can be used to modify the lexical tree while visiting the mdast tree.
@@ -265,46 +267,56 @@ export const MdastMdxJsEsmVisitor: MdastImportVisitor<MdxjsEsm> = {
   }
 }
 
-export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = {
-  testNode: (node) => {
-    return node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement'
-  },
-  visitNode({ lexicalParent, mdastNode, actions }) {
-    ;(lexicalParent as ElementNode).append(
-      $createJsxNode({
-        name: mdastNode.name!,
-        kind: mdastNode.type === 'mdxJsxTextElement' ? 'text' : 'flow',
-        //TODO: expressions are not supported yet
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        attributes: mdastNode.attributes as any,
-        updateFn: (lexicalParent) => {
-          actions.visitChildren(mdastNode, lexicalParent)
-        }
-      })
-    )
+export function createMdastMdxJsxElementVisitor(options: GetMdastVisitorsOptions): MdastImportVisitor<MdxJsxTextElement> {
+  return {
+    testNode: (node) => {
+      return node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement'
+    },
+    visitNode({ lexicalParent, mdastNode, actions }) {
+      ;(lexicalParent as ElementNode).append(
+        $createJsxNode({
+          name: mdastNode.name!,
+          kind: mdastNode.type === 'mdxJsxTextElement' ? 'text' : 'flow',
+          //TODO: expressions are not supported yet
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          attributes: mdastNode.attributes as any,
+          updateFn: (lexicalParent) => {
+            actions.visitChildren(mdastNode, lexicalParent)
+          },
+          useEmitterValues: options.useEmitterValues
+        })
+      )
+    }
   }
 }
 
-export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Content>> = {
-  MdastRootVisitor,
-  MdastParagraphVisitor,
-  MdastTextVisitor,
-  MdastFormattingVisitor,
-  MdastInlineCodeVisitor,
-  MdastLinkVisitor,
-  MdastHeadingVisitor,
-  MdastListVisitor,
-  MdastListItemVisitor,
-  MdastBlockQuoteVisitor,
-  MdastCodeVisitor,
-  MdastThematicBreakVisitor,
-  MdastImageVisitor,
-  MdastFrontmatterVisitor,
-  MdastAdmonitionVisitor,
-  MdastMdxJsEsmVisitor,
-  MdastMdxJsxElementVisitor,
-  MdastTableVisitor,
-  MdastLeafDirectiveVisitor
+export type GetMdastVisitorsOptions = {
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
+  usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
+}
+
+export function getMdastVisitors(options: GetMdastVisitorsOptions) {
+  return {
+    MdastRootVisitor,
+    MdastParagraphVisitor,
+    MdastTextVisitor,
+    MdastFormattingVisitor,
+    MdastInlineCodeVisitor,
+    MdastLinkVisitor,
+    MdastHeadingVisitor,
+    MdastListVisitor,
+    MdastListItemVisitor,
+    MdastBlockQuoteVisitor,
+    MdastCodeVisitor,
+    MdastThematicBreakVisitor,
+    MdastImageVisitor,
+    MdastFrontmatterVisitor,
+    MdastAdmonitionVisitor,
+    MdastMdxJsEsmVisitor,
+    MdastMdxJsxElementVisitor: createMdastMdxJsxElementVisitor(options),
+    MdastTableVisitor,
+    MdastLeafDirectiveVisitor
+  }
 }
 
 function isParent(node: unknown): node is Mdast.Parent {

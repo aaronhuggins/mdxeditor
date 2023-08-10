@@ -10,11 +10,12 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import * as RadixPopover from '@radix-ui/react-popover'
 import { useForm } from 'react-hook-form'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
+import type { EditorSystemComponent } from '../../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../../system/EditorLiteSystemComponent'
 import { JsxEditorProps } from '../../types/NodeDecoratorsProps'
 import { PopoverContent, PopoverTrigger } from '../../ui/Popover/primitives'
 
-export function JsxEditor({ kind, attributes, componentName, editor, onSubmit, theme }: JsxEditorProps) {
+export function JsxEditor({ kind, attributes, componentName, editor, onSubmit, theme, useEmitterValues }: JsxEditorProps) {
   if (kind === 'flow') {
     return (
       <div>
@@ -28,7 +29,7 @@ export function JsxEditor({ kind, attributes, componentName, editor, onSubmit, t
   return (
     <span>
       <span>
-        <InlineJsxComponent attributes={attributes} componentName={componentName} onSubmit={onSubmit} />
+        <InlineJsxComponent attributes={attributes} componentName={componentName} onSubmit={onSubmit} useEmitterValues={useEmitterValues} />
       </span>
       <span>
         {componentName}
@@ -48,9 +49,10 @@ interface InlineJsxComponentProps {
   attributes: MdxJsxAttribute[]
   componentName: string
   onSubmit: (values: Record<string, string>) => void
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
-const InlineJsxComponent = ({ attributes, componentName, onSubmit }: InlineJsxComponentProps) => {
+const InlineJsxComponent = ({ attributes, componentName, onSubmit, useEmitterValues }: InlineJsxComponentProps) => {
   const [open, setOpen] = React.useState(false)
 
   const decoratedOnSubmit = React.useCallback(
@@ -68,7 +70,7 @@ const InlineJsxComponent = ({ attributes, componentName, onSubmit }: InlineJsxCo
       </PopoverTrigger>
       <RadixPopover.Portal>
         <PopoverContent>
-          <JsxPropertyPanel attributes={attributes} componentName={componentName} onSubmit={decoratedOnSubmit} />
+          <JsxPropertyPanel attributes={attributes} componentName={componentName} onSubmit={decoratedOnSubmit} useEmitterValues={useEmitterValues} />
         </PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>
@@ -79,9 +81,10 @@ interface JsxPropertyPanelProps {
   componentName: string
   attributes: Array<MdxJsxAttribute>
   onSubmit: (values: Record<string, string>) => void
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
-const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes, componentName, onSubmit }) => {
+const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes, componentName, onSubmit, useEmitterValues }) => {
   const [jsxComponentDescriptors] = useEmitterValues('jsxComponentDescriptors')
   const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName)!
   const [editor] = useLexicalComposerContext()

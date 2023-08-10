@@ -5,6 +5,8 @@ import { TableNode } from '../nodes'
 import * as Mdast from 'mdast'
 import { LeafDirectiveNode } from '../nodes/LeafDirectiveNode'
 import { LeafDirective } from 'mdast-util-directive'
+import type { EditorSystemComponent } from '../system/EditorSystemComponent'
+import type { EditorLiteSystemComponent } from '../system/EditorLiteSystemComponent'
 
 export interface FrontmatterEditorProps {
   yaml: string
@@ -20,6 +22,7 @@ export interface JsxEditorProps {
   onSubmit: (values: Record<string, string>) => void
   theme: EditorThemeClasses
   editor: LexicalEditor
+  useEmitterValues: EditorLiteSystemComponent.UseEmitterValues & EditorSystemComponent.UseEmitterValues
 }
 
 export interface VoidEmitter {
