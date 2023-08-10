@@ -299,7 +299,7 @@ export type GetMdastVisitorsOptions = {
   usePublisher: EditorLiteSystemComponent.UsePublisher & EditorSystemComponent.UsePublisher
 }
 
-export function getMdastVisitors(options: GetMdastVisitorsOptions) {
+export function getMdastVisitors(options: GetMdastVisitorsOptions): Record<string, MdastImportVisitor<Mdast.Content>> {
   return {
     MdastRootVisitor,
     MdastParagraphVisitor,
@@ -404,7 +404,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
     }
 
     visitor.visitNode({
-      //@ts-expect-error root type is glitching
+      // @ts-expect-error: root type is glitching
       mdastNode,
       lexicalParent,
       actions: {
